@@ -1,0 +1,52 @@
+---
+title: "Hiking Functions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Hiking Functions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Hiking functions all take slope as input and output some ratio of distance (d) to cost, like speed (d/time) or efficiency (d/energy). It's worth noting that different hiking functions assume different representations of slope, degrees, radians, or rise-over-run.
+
+**hiker** currently implements the following hiking functions:  
+
+
+## Tobler's Hiking Function
+
+Defined by Tobler (1993) as a simple exponential function:
+
+$$v = 1.6 * exp(-3.5x + 0.5) * w$$
+
+where $x$ is the slope in _rise-over-run_ and $w$ is a weight equal to 1 for on-path and 0.6 for off-path hiking. By default, THF returns velocity in km/hr, but the internal `tobler` function converts this to m/s.  
+
+_Additional parameters_:  
+
+* `off.path` a logical, if TRUE (default), then `w = 0.6`, otherwise `w = 1`.
+
+
+## Campbell's Hiking Function
+
+Defined by Campbell (2019) as a modified Lorentz distribution:
+
+$$v = c \left[\frac{1}{\pi b \left(1 + \frac{\theta - a}{b}\right)^{2}}\right] + d + e\theta$$
+
+where $\theta$ is the slope in _degrees_ (note the difference with THF) and the parameters $a$, $b$, $c$, $d$, and $e$ are defined relative to the deciles of sampled hikers in Campbell's study. CHF returns velocity in m/s. The decile specifies how fast or slow the hiker is assumed to be. Note that for compatibility with the `gdistance` calculation of slope, the internal `campbell` function assumes values are in rise-over-run, then converts them to degrees for the calculation of velocity.  
+
+_Additional parameters_:  
+
+* `decile` an integer, one of `10L`, `20L`, ..., `90L` (default is `50L`).
+
+
+## References
+
+Campbell, Michael J., Philip E. Dennison, Bret W. Butler, and Wesley G. Page (2019). "Using crowdsourced fitness tracker data to model the relationship between slope and travel rates. _Applied Geography_ 106, 93-107. [https://doi.org/10.1016/j.apgeog.2019.03.008]
+
+Tobler, Waldo R. (1993). "Three Presentations on Geographical Analysis and Modeling: Non-Isotropic Geographic Modeling, Speculations on the Geometry of Geography, and Global Spatial Analysis." _National Center for Geographic Information and Analysis, Technical Report_ 93-1.  

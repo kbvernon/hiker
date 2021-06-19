@@ -1,0 +1,33 @@
+Package: hiker
+Title: Model Hiking Paths Over Costly Terrains
+Description: The hiker package provides a suite of functions to model least-cost
+    distances between points, least-cost paths between points, and accumulated 
+    travel time from any point to any location across a landscape. To estimate 
+    the cost of traversing a terrain, hiker implements a few well-known hiking 
+    functions, including Tobler and Campbell. 
+Version: 0.1.0
+Date: 2021-06-01
+Authors@R: person(given = c("Kenneth", "Blake"), 
+                  family = "Vernon", 
+                  email = "kenneth.b.vernon@gmail.com",
+                  role = c("aut", "cre"),
+                  comment = c(ORCID = "0000-0003-0098-5092"))
+URL: https://github.com/kbvernon/hiker
+BugReports: https://github.com/kbvernon/hiker/issues
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    igraph,
+    Matrix,
+    methods,
+    sf,
+    terra
+Suggests: 
+    dplyr,
+    knitr,
+    markdown,
+    rmarkdown
+VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+License: MIT + file LICENSE
