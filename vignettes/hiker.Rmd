@@ -10,13 +10,13 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
+  strip.white = TRUE,
   comment = "#>",
   out.width = "100%",
   warning = FALSE,
   message = FALSE,
-  fig.retina = 2,
-  fig.asp = 0.7, 
-  fig.width = 500/72
+  fig.retina = 3,
+  fig.asp = 0.7
 )
 ```
 
@@ -47,10 +47,10 @@ Note the 'hf' prefix. Short for "hiking function," it helps avoid potential name
 For demonstration purposes, imagine going for a hike around the [Red Butte Canyon Research Natural Area](https://redbuttecanyon.net/) (RNA) in the Wasatch Foothills above the University of Utah. Maybe you want to know how long it would take to hike from one ridge to another or from the mouth to the crest or even just from any random point to any other location. This is the kind of problem hiker is intended to solve.  
 
 ```{r setup}
-
 library(hiker)
 library(sf)
 library(terra)
+library(viridis)
 
 ```
 
@@ -59,8 +59,7 @@ library(terra)
 
 To estimate travel time, or to find the least-cost path, the first step is to generate a cost surface. This is the terrain being hiked in R.  
 
-```{r, fig.width = 800/72}
-
+```{r}
 fn <- system.file("extdata/red_butte_dem.tif", package = "hiker")
 red_butte_dem <- rast(fn)
 
@@ -72,23 +71,22 @@ The result of `hf_terrain()` is a `terrain` object. This is just a list with inf
 
 ```{r}
 terrain
+
 ```
 
 To convert a `terrain` to a `SpatRaster`, use `hf_rasterize()`. This is mostly useful for plotting.
 
-```{r, fig.width = 800/72}
-
+```{r, fig.width = 700/72, fig.asp = 0.4}
 par(mfrow = c(1, 2))
 
-plot(red_butte_dem, main = "Elevation (meters)")
-plot(hf_rasterize(terrain), main = "Travel cost (seconds)")
+plot(red_butte_dem, main = "Elevation (meters)", col = viridis(50))
+plot(hf_rasterize(terrain), main = "Travel cost (seconds)", col = viridis(50))
 
 ```
 
 By default, `hf_terrain()` implements the Campbell hiking function (CHF), but you can also request Tobler's hiking function (THF) by passing the character string 'tobler' to the `hf` argument,
 
 ```{r, eval = FALSE}
-
 hf_terrain(red_butte_dem, hf = "tobler")
 
 ```
@@ -96,7 +94,6 @@ hf_terrain(red_butte_dem, hf = "tobler")
 Additional arguments can be passed down to the specific user-selected hiking function. For instance, CHF will estimate velocity relative to the deciles of the sampled hikers used in the original analysis, with lower deciles representing slower hikers, upper deciles faster hikers. In hiker, CHF defaults to the median.
 
 ```{r, eval = FALSE}
-
 hf_terrain(red_butte_dem, hf = "campbell", decile = 90)
 
 ```
@@ -106,26 +103,24 @@ hf_terrain(red_butte_dem, hf = "campbell", decile = 90)
 
 The RNA has an old reservoir built by the US military in 1930 to supply Fort Douglass (now part of the University of Utah). Obviously, we wouldn't expect a hiker to defy the laws of physics by walking on water, so we need to add that information to the `terrain`. This is done with `hf_barrier()`.  
 
-```{r, fig.width = 800/72}
-
+```{r, fig.width = 700/72, fig.asp = 0.4}
 fn <- system.file("extdata/red_butte_reservoir.geojson", package = "hiker")
-red_butte_reservoir <- st_read(fn)
+red_butte_reservoir <- read_sf(fn)
 
 terrain2 <- hf_barrier(terrain, red_butte_reservoir)
 
 par(mfrow = c(1, 2))
 
-plot(hf_rasterize(terrain),  main = "No barrier")
-plot(hf_rasterize(terrain2), main = "Barrier")
+plot(hf_rasterize(terrain),  main = "No barrier", col = viridis(50))
+plot(hf_rasterize(terrain2), main = "Barrier", col = viridis(50))
 
 ```
 
 We can also _channelize_ a cost surface by making it easier to pass through an area. 
 
-```{r, fig.width = 800/72}
-
+```{r, fig.width = 700/72, fig.asp = 0.4}
 fn <- system.file("extdata/red_butte_road.geojson", package = "hiker")
-red_butte_road <- st_read(fn)
+red_butte_road <- read_sf(fn)
 
 terrain3 <- hf_channel(terrain, 
                        channel = st_buffer(red_butte_road, dist = 100),
@@ -133,8 +128,8 @@ terrain3 <- hf_channel(terrain,
 
 par(mfrow = c(1, 2))
 
-plot(hf_rasterize(terrain),  main = "No channel")
-plot(hf_rasterize(terrain3), main = "Channel")
+plot(hf_rasterize(terrain),  main = "No channel", col = viridis(50))
+plot(hf_rasterize(terrain3), main = "Channel", col = viridis(50))
 
 ```
 
@@ -145,7 +140,6 @@ plot(hf_rasterize(terrain3), main = "Channel")
 Now, let's suppose we have these start and end points.
 
 ```{r}
-
 from <- st_sf(geometry = st_sfc(st_point(c(432000, 4514000)),
                                 st_point(c(434000, 4518000)),
                                 crs = 26912))
@@ -162,8 +156,7 @@ to <- st_sf(geometry = st_sfc(st_point(c(431000, 4515000)),
 
 In the simplest case, we just want to know the cost of traveling the shortest path from each start to each end point. For this, hiker provides the `hf_appraise()` function, as in let's appraise the cost of taking the short path.
 
-```{r, eval = FALSE}
-
+```{r}
 hf_appraise(terrain, from, to)
 
 ```
@@ -175,14 +168,29 @@ As you see, this returns a data.frame in long format, with columns for the from-
 
 What about those shortest paths, though? Where are they? For this, we can use the `hf_hike()` function, as in let's take a hike along the short paths.  
 
-```{r, eval = FALSE}
-
+```{r, fig.width = 400/72}
 short_paths <- hf_hike(terrain, from, to)
 
-plot(red_butte_dem)
-plot(st_geometry(short_paths), lty = 2, add = TRUE)
-plot(st_geometry(from), pch = 19, col = "red2", add = TRUE)
-plot(st_geometry(to), pch = 19, col = "dodgerblue4", add = TRUE)
+plot(red_butte_dem, col = viridis(50))
+
+plot(st_geometry(short_paths),
+     col = "white",
+     lwd = 1.5,
+     add = TRUE)
+
+plot(st_geometry(from), 
+     pch = 21, 
+     cex = 1.3, 
+     bg = "red2", 
+     col = "white", 
+     add = TRUE)
+
+plot(st_geometry(to), 
+     pch = 21, 
+     cex = 1.3, 
+     bg = "dodgerblue3", 
+     col = "white", 
+     add = TRUE)
 
 ```
 
@@ -191,12 +199,17 @@ plot(st_geometry(to), pch = 19, col = "dodgerblue4", add = TRUE)
 
 Finally, we can ask how long it would take to get from any one point to all other locations.
 
-```{r}
-
+```{r, fig.width = 400/72}
 accumulated_cost <- hf_survey(terrain, from)
 
-plot(accumulated_cost)
-plot(st_geometry(from), pch = 19, col = "red2", add = TRUE)
+plot(accumulated_cost, col = viridis(50))
+
+plot(st_geometry(from), 
+     pch = 21, 
+     cex = 1.3, 
+     bg = "red2", 
+     col = "white", 
+     add = TRUE)
 
 ```
 
@@ -206,7 +219,6 @@ plot(st_geometry(from), pch = 19, col = "red2", add = TRUE)
 The two functions designed to modify a cost surface, `hf_barrier()` and `hf_channel()` are kinda-sorta pipeable. The first argument to each is a data object, in this case a `terrain`, and they both return a modified version of the same.
 
 ```{r}
-
 library(dplyr)
 
 red_butte_dem %>% 
@@ -223,10 +235,9 @@ red_butte_dem %>%
 Unfortunately, it's not obvious - not obvious to me, anyway - how best to handle lines and polygons, so the path functions in hiker work exclusively with POINT and MULTIPOINT geometries. That said, there are a few, shall we say, less than desireable methods for working with other geometries. 
 
 
-### Centroids
+### Center
 
-```{r}
-
+```{r, fig.width = 400/72}
 from <- st_centroid(red_butte_reservoir)
 
 accumulated_cost <-
@@ -240,8 +251,13 @@ bb8 <-
   st_bbox() %>% 
   st_as_sfc(crs = st_crs(red_butte_reservoir))
 
-plot(crop(accumulated_cost, bb8))
-plot(st_geometry(from), pch = 19, col = "red2", add = TRUE)
+plot(crop(accumulated_cost, bb8), col = viridis(50))
+plot(st_geometry(from), 
+     pch = 21, 
+     cex = 1.3, 
+     bg = "red2", 
+     col = "white", 
+     add = TRUE)
 
 ```
 
@@ -250,8 +266,7 @@ plot(st_geometry(from), pch = 19, col = "red2", add = TRUE)
 
 You can cast a LINESTRING or POLYGON to POINT, though beware that this will get out of hand pretty quick if you have a large shape or one with densely packed vertices.
 
-```{r}
-
+```{r, fig.width = 400/72}
 from <- st_cast(red_butte_reservoir, "POINT")
 
 accumulated_cost <-
@@ -259,28 +274,37 @@ accumulated_cost <-
   hf_terrain() %>%
   hf_survey(from)
 
-plot(crop(accumulated_cost, bb8))
-plot(st_geometry(from), pch = 19, col = "red2", add = TRUE)
+plot(crop(accumulated_cost, bb8), col = viridis(50))
+plot(st_geometry(from), 
+     pch = 21, 
+     cex = 1.3, 
+     bg = "red2", 
+     col = "white", 
+     add = TRUE)
 
 ```
 
 
 ### Sample
 
-```{r}
-
+```{r, fig.width = 400/72}
 from <-
   red_butte_reservoir %>%
   st_cast("POINT") %>%
-  dplyr::sample_n(round(nrow(.)/10))
+  dplyr::sample_n(round(n()/10))
 
 accumulated_cost <-
   red_butte_dem %>%
   hf_terrain() %>%
   hf_survey(from)
 
-plot(crop(accumulated_cost, bb8))
-plot(st_geometry(from), pch = 19, col = "red2", add = TRUE)
+plot(crop(accumulated_cost, bb8), col = viridis(50))
+plot(st_geometry(from), 
+     pch = 21, 
+     cex = 1.3, 
+     bg = "red2", 
+     col = "white", 
+     add = TRUE)
 
 ```
 

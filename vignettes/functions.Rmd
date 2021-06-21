@@ -14,9 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-Hiking functions all take slope as input and output some ratio of distance (d) to cost, like speed (d/time) or efficiency (d/energy). It's worth noting that different hiking functions assume different representations of slope, degrees, radians, or rise-over-run.
-
-**hiker** currently implements the following hiking functions:  
+Hiking functions all take slope as input and output some ratio of distance (d) to cost, like speed (d/time) or efficiency (d/energy). While there's plenty out there to choose from, **hiker** currently implements just two:  
 
 
 ## Tobler's Hiking Function
@@ -30,6 +28,7 @@ where $x$ is the slope in _rise-over-run_ and $w$ is a weight equal to 1 for on-
 _Additional parameters_:  
 
 * `off.path` a logical, if TRUE (default), then `w = 0.6`, otherwise `w = 1`.
+
 
 
 ## Campbell's Hiking Function

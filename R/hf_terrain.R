@@ -66,33 +66,20 @@ hf_terrain <- function(x,
 
   stop_if_not_SpatRaster(x)
 
-  n_cells <- terra::ncell(x)
-
   # find adjacent cells in the raster
   # make sure to ignore all na values
+  n_cells <- terra::ncell(x)
+
   na_cells <- which(is.na(terra::values(x)))
 
   cells <- setdiff(1:n_cells, na_cells)
 
-  # this bit on adjacency will be greatly simplified
-  # once terra 1.2-18 is available
-  # see https://github.com/rspatial/terra/issues/239
-  neighbors <- switch(as.character(neighbors)[1],
-                      "4" = "rook",
-                      "8" = "queen",
-                      "16"= "16",
-                      stop("hiker supports only 4, 8, or 16 neighbors."))
-
   adj <- terra::adjacent(x,
                          cells = cells,
-                         directions = neighbors)
+                         directions = neighbors,
+                         pairs = TRUE)
 
-  adj <- cbind("from" = rep(as.integer(rownames(adj)), each = ncol(adj)),
-               "to" = as.vector(t(adj)))
-
-  adj <- adj[!is.na(adj[, 2]), ]
-
-  adj <- adj[!(adj[, 2] %in% na_cells), ]
+  adj <- adj[!adj[, 2] %in% na_cells, ]
 
 
   ### slope ###
@@ -131,6 +118,7 @@ hf_terrain <- function(x,
 
   conductance[i] <- 0
 
+  # build matrix
   cm <- Matrix::Matrix(0, nrow = n_cells, ncol = n_cells)
 
   cm[adj] <- conductance
