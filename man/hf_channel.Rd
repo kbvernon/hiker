@@ -30,7 +30,7 @@ fn <- system.file("extdata/red_butte_dem.tif", package = "hiker")
 red_butte_dem <- rast(fn)
 
 fn <- system.file("extdata/red_butte_road.geojson", package = "hiker")
-red_butte_road <- st_read(fn)
+red_butte_road <- read_sf(fn)
 
 terrain <- hf_terrain(red_butte_dem, hf = "tobler")
 

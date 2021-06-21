@@ -22,7 +22,7 @@
 #' red_butte_dem <- rast(fn)
 #'
 #' fn <- system.file("extdata/red_butte_road.geojson", package = "hiker")
-#' red_butte_road <- st_read(fn)
+#' red_butte_road <- read_sf(fn)
 #'
 #' terrain <- hf_terrain(red_butte_dem, hf = "tobler")
 #'
@@ -64,8 +64,10 @@ hf_channel <- function(x, channel, .m = 1) {
   i <- which(adj[, 1] %in% cells | adj[, 2] %in% cells)
   adj <- adj[i, ]
 
-  # (1/t)/.m == 1/(t*.m)
+  # want to reduce time, which means dividing conductance by .m
   x$conductance[adj] <- (x$conductance[adj] / .m)
+
+  x <- update_range(x)
 
   return(x)
 

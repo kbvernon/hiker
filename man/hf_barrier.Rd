@@ -27,7 +27,7 @@ fn <- system.file("extdata/red_butte_dem.tif", package = "hiker")
 red_butte_dem <- rast(fn)
 
 fn <- system.file("extdata/red_butte_reservoir.geojson", package = "hiker")
-red_butte_reservoir <- st_read(fn)
+red_butte_reservoir <- read_sf(fn)
 
 terrain <- hf_terrain(red_butte_dem)
 

@@ -51,6 +51,7 @@ time possible, what route should I take?
 library(hiker)
 library(sf)
 library(terra)
+library(viridis)
 ```
 
 ``` r
@@ -74,14 +75,20 @@ in R.
 #> class       : terrain 
 #> dimensions  : 268, 260, 69680 (nrow, ncol, ncell)
 #> resolution  : 26.48, 26.48 (x, y)
-#> epsg        : 26912 
-#> cost        : 0, 9.98 (min, max)
+#> extent      : 430567.2 437451.2 4512415 4519511 (xmin, xmax, ymin, ymax)
+#> coord.ref   : EPSG 26912 
+#> min cost    : 9.98 
+#> max cost    : 75.86
 
 # to adjust legend (plg) and axis (pax) text size
 pax <- list(cex.axis = 0.65)
 plg <- list(cex = 0.65)
 
-plot(hf_rasterize(terrain), pax = pax, plg = plg)
+plot(hf_rasterize(terrain), 
+     col = viridis(50), 
+     pax = pax, 
+     plg = plg)
+
 title(main = "Travel Cost (sec)", adj = 0, line = 0.3)
 ```
 
@@ -107,11 +114,31 @@ short_path
 Now we can visualize this `short_path`.
 
 ``` r
-plot(red_butte_dem, pax = pax, plg = plg)
+plot(red_butte_dem, 
+     col = viridis(50),
+     pax = pax, 
+     plg = plg)
+
 title(main = "Path over Elevation (m)", adj = 0, line = 0.3)
-plot(st_geometry(short_path), add = TRUE)
-plot(st_geometry(from), pch = 19, col = "red2", add = TRUE)
-plot(st_geometry(to), pch = 19, col = "dodgerblue4", add = TRUE)
+
+plot(st_geometry(short_path),
+     col = "white",
+     lwd = 1.5,
+     add = TRUE)
+
+plot(st_geometry(from), 
+     pch = 21, 
+     cex = 1.3, 
+     bg = "red2", 
+     col = "white", 
+     add = TRUE)
+
+plot(st_geometry(to), 
+     pch = 21, 
+     cex = 1.3, 
+     bg = "dodgerblue3", 
+     col = "white", 
+     add = TRUE)
 ```
 
 <img src="man/figures/README-short_path_plot-1.png" width="100%" />

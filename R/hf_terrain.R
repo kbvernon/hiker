@@ -1,14 +1,15 @@
 
 #' Cost surface
 #'
-#' Create a `terrain` representing the cost of travel. No assumption is
-#' made about existing trails or paths.
+#' Create a `terrain` representing the cost of travel. For a list of available
+#' hiking functions and their parameters, see
+#' `vignette("hiking functions", package = "hiker")`.
 #'
 #' The `SpatRaster` must have a projected CRS, with both distance units and elevation
 #' values in meters.
 #'
-#' For a list of available hiking functions and their parameters, see
-#' `vignette("hiking functions", package = "hiker")`.
+#' The range shown when printing excludes zero and infinite values
+#' for min and max, respectively.
 #'
 #' @param x a `SpatRaster` with elevation values.
 #' @param hf a character string specifying the preferred hiking function. Options
@@ -80,9 +81,7 @@ hf_terrain <- function(x,
                       "4" = "rook",
                       "8" = "queen",
                       "16"= "16",
-                      stop(paste0("hiker does not support ",
-                                  neighbors[1],
-                                  " neighbors, only 4, 8, or 16.")))
+                      stop("hiker supports only 4, 8, or 16 neighbors."))
 
   adj <- terra::adjacent(x,
                          cells = cells,
@@ -146,14 +145,21 @@ hf_terrain <- function(x,
 
   xcrs <- terra::crs(x, describe = TRUE)
   epsg <- as.integer(xcrs["EPSG"])
-  epsg <- paste0("epsg:", epsg)
+  epsg <- paste0("EPSG:", epsg)
 
-  terrain <- list("conductance" = cm,
-                  "neighbors"   = neighbors,
-                  "nrow"        = terra::nrow(x),
-                  "ncol"        = terra::ncol(x),
-                  "bb8"         = bb8,
-                  "epsg"        = epsg)
+  tmin <- 1/max(conductance)
+  tmax <- 1/min(conductance[conductance > 0])
+
+  terrain <-
+    list(
+      "conductance" = cm,
+      "neighbors"   = neighbors,
+      "nrow"        = terra::nrow(x),
+      "ncol"        = terra::ncol(x),
+      "bb8"         = bb8,
+      "epsg"        = epsg,
+      "range"       = c("min" = tmin, "max" = tmax)
+    )
 
   class(terrain) <- "terrain"
 
@@ -163,34 +169,47 @@ hf_terrain <- function(x,
 
 
 
-
 #' @name hf_terrain
 #' @export
 #'
 print.terrain <- function(x, ...){
 
-  cat("class       :", class(x), "\n")
-
   ncell <- x$nrow * x$ncol
 
-  cat("dimensions  : ", x$nrow, ", ", x$ncol, ", ", ncell, " (nrow, ncol, ncell)\n", sep = "")
-
-  dx <- (x$bb8[["xmax"]] - x$bb8[["xmin"]])/x$ncol
-  dy <- (x$bb8[["ymax"]] - x$bb8[["ymin"]])/x$nrow
+  dx <- (x$bb8[["xmax"]] - x$bb8[["xmin"]]) / x$ncol
+  dy <- (x$bb8[["ymax"]] - x$bb8[["ymin"]]) / x$nrow
 
   dx <- round(dx, digits = 2)
   dy <- round(dy, digits = 2)
 
-  cat("resolution  : ", dx, ", ", dy, " (x, y)\n", sep = "")
-  cat("epsg        :", gsub("epsg:", "", x$epsg), "\n")
+  tmin <- round(x$range[["min"]], digits = 2)
+  tmax <- round(x$range[["max"]], digits = 2)
 
-  # invert conductance to get cost
-  rmin <- round(1/min(x$conductance), digits = 2)
+  cat("class       :", class(x), "\n")
+  cat("dimensions  :", paste(x$nrow, x$ncol, ncell, sep = ", "), "(nrow, ncol, ncell)\n")
+  cat("resolution  :", paste(dx, dy, sep = ", "), "(x, y)\n")
+  cat("extent      :", x$bb8, "(xmin, xmax, ymin, ymax)\n")
+  cat("coord.ref   :", gsub(":", " ", x$epsg), "\n")
+  cat("min cost    :", tmin, "\n")
+  cat("max cost    :", tmax, "\n")
 
-  if (is.infinite(rmin)) rmin <- 0
+}
 
-  rmax <- round(1/max(x$conductance), digits = 2)
 
-  cat("cost        : ", rmin, ", ", rmax, " (min, max)", sep = "")
+
+#' @noRd
+#'
+update_range <- function(x) {
+
+  new_values <- x$conductance@x
+
+  cmin <- min(new_values)
+  cmax <- max(new_values[is.finite(new_values)])
+
+  # invert conductance to get min and max travel cost
+  x$range[["min"]] <- 1/cmax
+  x$range[["max"]] <- 1/cmin
+
+  invisible(x)
 
 }

@@ -30,15 +30,16 @@ knight + queen).}
 a \code{terrain} representing cost of travel.
 }
 \description{
-Create a \code{terrain} representing the cost of travel. No assumption is
-made about existing trails or paths.
+Create a \code{terrain} representing the cost of travel. For a list of available
+hiking functions and their parameters, see
+\code{vignette("hiking functions", package = "hiker")}.
 }
 \details{
 The \code{SpatRaster} must have a projected CRS, with both distance units and elevation
 values in meters.
 
-For a list of available hiking functions and their parameters, see
-\code{vignette("hiking functions", package = "hiker")}.
+The range shown when printing excludes zero and infinite values
+for min and max, respectively.
 }
 \examples{
 library(terra)

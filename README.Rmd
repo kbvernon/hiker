@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
   out.width = "100%",
   warning = FALSE,
   message = FALSE,
-  fig.retina = 2,
+  fig.retina = 3,
   fig.asp = 0.7,
   global.par = TRUE
 )
@@ -61,6 +61,7 @@ Consider the [Red Butte Canyon Research Natural Area](https://redbuttecanyon.net
 library(hiker)
 library(sf)
 library(terra)
+library(viridis)
 
 ```
 
@@ -87,7 +88,11 @@ To figure out the "shortest" path from start to end, we need to have some sense 
 pax <- list(cex.axis = 0.65)
 plg <- list(cex = 0.65)
 
-plot(hf_rasterize(terrain), pax = pax, plg = plg)
+plot(hf_rasterize(terrain), 
+     col = viridis(50), 
+     pax = pax, 
+     plg = plg)
+
 title(main = "Travel Cost (sec)", adj = 0, line = 0.3)
 
 ```
@@ -106,11 +111,31 @@ Now we can visualize this `short_path`.
 
 ```{r short_path_plot, fig.width = 350/72}
 
-plot(red_butte_dem, pax = pax, plg = plg)
+plot(red_butte_dem, 
+     col = viridis(50),
+     pax = pax, 
+     plg = plg)
+
 title(main = "Path over Elevation (m)", adj = 0, line = 0.3)
-plot(st_geometry(short_path), add = TRUE)
-plot(st_geometry(from), pch = 19, col = "red2", add = TRUE)
-plot(st_geometry(to), pch = 19, col = "dodgerblue4", add = TRUE)
+
+plot(st_geometry(short_path),
+     col = "white",
+     lwd = 1.5,
+     add = TRUE)
+
+plot(st_geometry(from), 
+     pch = 21, 
+     cex = 1.3, 
+     bg = "red2", 
+     col = "white", 
+     add = TRUE)
+
+plot(st_geometry(to), 
+     pch = 21, 
+     cex = 1.3, 
+     bg = "dodgerblue3", 
+     col = "white", 
+     add = TRUE)
 
 ```
 

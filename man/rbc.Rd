@@ -10,7 +10,7 @@
 \alias{rna}
 \title{Red Butte Canyon Research Natural Area}
 \format{
-The DEm raster is saved as a TIF file, with elevation in meters.
+The DEM raster is saved as a TIF file, with elevation in meters.
 The three vectors are saved as GEOJSON. All three vectors have a name
 attribute and geometry. All spatial data share the same CRS,
 \emph{NAD83 / UTM zone 12N} (EPSG: 26912).
