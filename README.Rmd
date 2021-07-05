@@ -25,7 +25,7 @@ par(cex.main = 0.7)
 ```
 
 
-# hiker <img src='man/figures/logo.svg' align="right" height="160" />
+# hiker <img src='man/figures/logo.png' align="right" height="160" />
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/kbvernon/hiker/workflows/R-CMD-check/badge.svg)](https://github.com/kbvernon/hiker/actions)
@@ -33,7 +33,7 @@ par(cex.main = 0.7)
 
 The __hiker__ package aids in the modeling of specifically human movement across a landscape. Much of its code was inspired by Jacob van Etten's (2017) [`gdistance`](https://github.com/AgrDataSci/gdistance) package, though it works with more modern spatial tools, specifically [`sf`](https://r-spatial.github.io/sf/) and [`terra`](https://rspatial.github.io/terra/index.html). 
 
-Note: `terra` is currently facing some issues (see, eg., [#30](https://github.com/rspatial/terra/issues/30)) with its underlying Rcpp that throw seemingly random warnings and errors. For example, you might see:  
+Note: `terra` is currently facing some issues with its underlying Rcpp that throw seemingly random warnings and errors (see, eg., [#30](https://github.com/rspatial/terra/issues/30)). For example, you might see:  
 
 ```r 
 Error in x$.self$finalize() : attempt to apply non-function 
@@ -155,7 +155,6 @@ The hiker package differs from these packages in the following ways:
 2. hiker is tidy (or tries to be). As much as possible, code is written to comport with the `tidyverse` [style guide](https://style.tidyverse.org/), mostly thanks to `usethis::use_tidy_style()`, and development largely follows the guidelines described in Wickham and Bryan's [_R Packages_](https://r-pkgs.org/index.html).  
 2. hiker uses [`sf`](https://r-spatial.github.io/sf/) rather than its predecessor sp.  
 2. hiker uses [`terra`](https://rspatial.github.io/terra/index.html) instead of its predecessor `raster`.
-2. ~~hiker works directly with `igraph` objects defined by the [`igraph`](https://igraph.org/r/) package and exposes these to the user. I seriously doubt that anyone using this package will ever have the need to do any fine-grained manipulations of the underlying graph, but they can!~~ Lesson learned. hiker works with sparse matrices, as in `gdistance`, until it comes time to calculate travel times and paths, at which point it converts the matrix to an `igraph`.
 
 
 

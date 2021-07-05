@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# hiker <img src='man/figures/logo.svg' align="right" height="160" />
+# hiker <img src='man/figures/logo.png' align="right" height="160" />
 
 <!-- badges: start -->
 
@@ -15,9 +15,9 @@ package, though it works with more modern spatial tools, specifically
 [`sf`](https://r-spatial.github.io/sf/) and
 [`terra`](https://rspatial.github.io/terra/index.html).
 
-Note: `terra` is currently facing some issues (see, eg.,
-[\#30](https://github.com/rspatial/terra/issues/30)) with its underlying
-Rcpp that throw seemingly random warnings and errors. For example, you
+Note: `terra` is currently facing some issues with its underlying Rcpp
+that throw seemingly random warnings and errors (see, eg.,
+[\#30](https://github.com/rspatial/terra/issues/30)). For example, you
 might see:
 
 ``` r
@@ -166,14 +166,6 @@ The hiker package differs from these packages in the following ways:
     predecessor sp.  
 4.  hiker uses [`terra`](https://rspatial.github.io/terra/index.html)
     instead of its predecessor `raster`.
-5.  ~~hiker works directly with `igraph` objects defined by the
-    [`igraph`](https://igraph.org/r/) package and exposes these to the
-    user. I seriously doubt that anyone using this package will ever
-    have the need to do any fine-grained manipulations of the underlying
-    graph, but they can!~~ Lesson learned. hiker works with sparse
-    matrices, as in `gdistance`, until it comes time to calculate travel
-    times and paths, at which point it converts the matrix to an
-    `igraph`.
 
 ## References
 

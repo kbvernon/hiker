@@ -45,7 +45,7 @@ hf_survey <- function(x, from) {
                     crs    = x$epsg)
 
   from_cells <- terra::cellFromXY(rr, from_xy)
-  to_cells <- 1:terra::ncell(rr)
+  to_cells <- unique(as.integer(x$conductance@j)) + 1
 
   graph <- igraph::graph_from_adjacency_matrix(x$conductance,
                                                mode = "directed",
@@ -54,15 +54,11 @@ hf_survey <- function(x, from) {
   # invert conductance to get travel cost
   igraph::E(graph)$weight <- (1/igraph::E(graph)$weight)
 
-  # this cost matrix has a row for each start point
+  # cost matrix: row for each start point, column for each end point
   # to get the cost surface from all of them, we take the minimum from each start
-  # a faster strategy than looping through each pixel might be to fold each start
-  # into a SpatRaster and let terra do it in C++ all at once
   cost <- igraph::distances(graph, from_cells, to_cells, mode = "out")
 
-  cost <- apply(t(cost), 1, min)
-
-  rr[to_cells] <- c(t(cost))
+  rr[to_cells] <- apply(cost, 2, min)
 
   return(rr)
 
