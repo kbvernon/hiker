@@ -82,7 +82,7 @@ stop_if_not_SpatRaster <- function(x) {
 
   }
 
-  if (terra::isLonLat(x)) {
+  if (terra::is.lonlat(x)) {
 
     stop(paste0(
       "Projected CRS required.\n",
