@@ -132,8 +132,7 @@ hf_terrain <- function(x,
   bb8 <- c(bb8$xmin, bb8$xmax, bb8$ymin, bb8$ymax)
 
   xcrs <- terra::crs(x, describe = TRUE)
-  epsg <- as.integer(xcrs["EPSG"])
-  epsg <- paste0("EPSG:", epsg)
+  xcrs <- paste0(xcrs$authority, ":", xcrs$code)
 
   tmin <- 1/max(conductance)
   tmax <- 1/min(conductance[conductance > 0])
@@ -145,7 +144,7 @@ hf_terrain <- function(x,
       "nrow"        = terra::nrow(x),
       "ncol"        = terra::ncol(x),
       "bb8"         = bb8,
-      "epsg"        = epsg,
+      "crs"         = xcrs,
       "range"       = c("min" = tmin, "max" = tmax)
     )
 
@@ -177,7 +176,7 @@ print.terrain <- function(x, ...){
   cat("dimensions  :", paste(x$nrow, x$ncol, ncell, sep = ", "), "(nrow, ncol, ncell)\n")
   cat("resolution  :", paste(dx, dy, sep = ", "), "(x, y)\n")
   cat("extent      :", x$bb8, "(xmin, xmax, ymin, ymax)\n")
-  cat("coord.ref   :", gsub(":", " ", x$epsg), "\n")
+  cat("coord.ref   :", gsub(":", " ", x$crs), "\n")
   cat("min cost    :", tmin, "\n")
   cat("max cost    :", tmax, "\n")
 

@@ -37,12 +37,12 @@ hf_barrier <- function(x, barrier) {
   stop_if_not_terrain(x)
   stop_if_not_sf(barrier)
 
-  stop_if_not_crs_equal(x$epsg, barrier)
+  stop_if_not_crs_equal(x$crs, barrier)
 
   rr <- terra::rast(nrow   = x$nrow,
                     ncol   = x$ncol,
                     extent = terra::ext(x$bb8),
-                    crs    = x$epsg)
+                    crs    = x$crs)
 
   barrier <- terra::vect(barrier)
 

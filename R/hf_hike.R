@@ -47,7 +47,7 @@ hf_hike <- function(x, from, to, add_cost = FALSE) {
 
   stop_if_not_point(from, to)
 
-  stop_if_not_crs_equal(x$epsg, from, to)
+  stop_if_not_crs_equal(x$crs, from, to)
 
   from_xy <- sf::st_coordinates(from)[, 1:2, drop = FALSE]
   to_xy   <- sf::st_coordinates(to)[, 1:2, drop = FALSE]
@@ -55,7 +55,7 @@ hf_hike <- function(x, from, to, add_cost = FALSE) {
   rr <- terra::rast(nrow   = x$nrow,
                     ncol   = x$ncol,
                     extent = terra::ext(x$bb8),
-                    crs    = x$epsg)
+                    crs    = x$crs)
 
   from_cells <- terra::cellFromXY(rr, from_xy)
   to_cells   <- terra::cellFromXY(rr, to_xy)
@@ -97,7 +97,7 @@ hf_hike <- function(x, from, to, add_cost = FALSE) {
                       })
 
   # and then an sf
-  sf_col <- sf::st_sfc(line_list, crs = x$epsg)
+  sf_col <- sf::st_sfc(line_list, crs = x$crs)
 
   short_paths <- sf::st_sf(geometry = sf_col)
 

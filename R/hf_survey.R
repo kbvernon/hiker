@@ -35,14 +35,14 @@ hf_survey <- function(x, from) {
   stop_if_not_sf(from)
   stop_if_not_point(from)
 
-  stop_if_not_crs_equal(x$epsg, from)
+  stop_if_not_crs_equal(x$crs, from)
 
   from_xy <- sf::st_coordinates(from)[, 1:2, drop = FALSE]
 
   rr <- terra::rast(nrow   = x$nrow,
                     ncol   = x$ncol,
                     extent = terra::ext(x$bb8),
-                    crs    = x$epsg)
+                    crs    = x$crs)
 
   from_cells <- terra::cellFromXY(rr, from_xy)
   to_cells <- unique(as.integer(x$conductance@j)) + 1

@@ -46,12 +46,12 @@ hf_channel <- function(x, channel, .m = 1) {
   stop_if_not_terrain(x)
   stop_if_not_sf(channel)
 
-  stop_if_not_crs_equal(x$epsg, channel)
+  stop_if_not_crs_equal(x$crs, channel)
 
   rr <- terra::rast(nrow   = x$nrow,
                     ncol   = x$ncol,
                     extent = terra::ext(x$bb8),
-                    crs    = x$epsg)
+                    crs    = x$crs)
 
   channel <- terra::vect(channel)
 

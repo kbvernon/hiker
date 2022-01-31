@@ -39,7 +39,7 @@ hf_appraise <- function(x, from, to) {
 
   stop_if_not_point(from, to)
 
-  stop_if_not_crs_equal(x$epsg, from, to)
+  stop_if_not_crs_equal(x$crs, from, to)
 
   from_xy <- sf::st_coordinates(from)[, 1:2, drop = FALSE]
   to_xy   <- sf::st_coordinates(to)[, 1:2, drop = FALSE]
@@ -47,7 +47,7 @@ hf_appraise <- function(x, from, to) {
   rr <- terra::rast(nrow   = x$nrow,
                     ncol   = x$ncol,
                     extent = terra::ext(x$bb8),
-                    crs    = x$epsg)
+                    crs    = x$crs)
 
   from_cells <- terra::cellFromXY(rr, from_xy)
   to_cells   <- terra::cellFromXY(rr, to_xy)
