@@ -74,7 +74,7 @@ hf_hike <- function(x, from, to, add_cost = FALSE) {
 
   # return a list of lists of vectors of vertices on paths
   shorties <-
-    furrr::future_map(
+    lapply(
       from_cells,
       function(z) {
 
@@ -115,10 +115,6 @@ hf_hike <- function(x, from, to, add_cost = FALSE) {
   sf_col <- sf::st_sfc(line_list, crs = x$crs)
 
   short_paths <- sf::st_sf(geometry = sf_col)
-
-
-  # filter out empty geometries
-  # short_paths <- subset(short_paths, !sf::st_is_empty(short_paths))
 
   # add indices
   short_paths <- transform(

@@ -17,7 +17,6 @@ BugReports: https://github.com/kbvernon/hiker/issues
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    furrr,
     igraph,
     Matrix,
     methods,
