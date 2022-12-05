@@ -1,4 +1,5 @@
 
+
 #' Shortest path between points
 #'
 #' Calculate the "shortest" or least-cost paths between multiple start and end points.
@@ -52,49 +53,63 @@ hf_hike <- function(x, from, to, add_cost = FALSE) {
   from_xy <- sf::st_coordinates(from)[, 1:2, drop = FALSE]
   to_xy   <- sf::st_coordinates(to)[, 1:2, drop = FALSE]
 
-  rr <- terra::rast(nrow   = x$nrow,
-                    ncol   = x$ncol,
-                    extent = terra::ext(x$bb8),
-                    crs    = x$crs)
+  rr <- terra::rast(
+    nrow   = x$nrow,
+    ncol   = x$ncol,
+    extent = terra::ext(x$bb8),
+    crs    = x$crs
+  )
 
   from_cells <- terra::cellFromXY(rr, from_xy)
   to_cells   <- terra::cellFromXY(rr, to_xy)
 
-  graph <- igraph::graph_from_adjacency_matrix(x$conductance,
-                                               mode = "directed",
-                                               weighted = TRUE)
+  graph <- igraph::graph_from_adjacency_matrix(
+    x$conductance,
+    mode = "directed",
+    weighted = TRUE
+  )
 
   # invert conductance to get travel cost
-  igraph::E(graph)$weight <- (1/igraph::E(graph)$weight)
+  igraph::E(graph)$weight <- (1 / igraph::E(graph)$weight)
 
   # return a list of lists of vectors of vertices on paths
-  shorties <- lapply(from_cells,
-                     function(z){
+  shorties <-
+    furrr::future_map(
+      from_cells,
+      function(z) {
 
-                       res <-
-                         igraph::shortest_paths(graph,
-                                                from = z,
-                                                to = to_cells,
-                                                mode = "out")
+        res <-
+          igraph::shortest_paths(
+            graph,
+            from = z,
+            to = to_cells,
+            mode = "out"
+          )
 
-                       res$vpath
+        res$vpath
 
-                     })
+      })
 
   # collapse (list of lists of vectors) to (list of vectors)
   shorties <- unlist(shorties, recursive = FALSE)
 
   # now we can just make a bunch of linestrings out of them
-  line_list <- lapply(shorties,
-                      function(z){
+  line_list <-
+    lapply(
+      shorties,
+      function(z) {
 
-                        cells <- as.vector(z)
+        cells <- as.vector(z)
 
-                        xy <- terra::xyFromCell(rr, cells)
+        # to handle case where from-vertex == to-vertex
+        if (length(cells) == 1) cells <- rep(cells, 2)
 
-                        sf::st_linestring(xy)
+        xy <- terra::xyFromCell(rr, cells)
 
-                      })
+        sf::st_linestring(xy)
+
+      }
+    )
 
   # and then an sf
   sf_col <- sf::st_sfc(line_list, crs = x$crs)
@@ -103,12 +118,14 @@ hf_hike <- function(x, from, to, add_cost = FALSE) {
 
 
   # filter out empty geometries
-  short_paths <- subset(short_paths, !sf::st_is_empty(short_paths))
+  # short_paths <- subset(short_paths, !sf::st_is_empty(short_paths))
 
   # add indices
-  short_paths <- transform(short_paths,
-                           from = rep(1:nrow(from_xy), each = nrow(to_xy)),
-                           to   = rep(1:nrow(to_xy), times = nrow(from_xy)))
+  short_paths <- transform(
+    short_paths,
+    from = rep(1:nrow(from_xy), each = nrow(to_xy)),
+    to   = rep(1:nrow(to_xy), times = nrow(from_xy))
+  )
 
   if (add_cost) {
 
