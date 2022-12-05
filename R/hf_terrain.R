@@ -46,8 +46,7 @@
 #'
 #' terrain <- hf_terrain(red_butte_dem)
 #'
-#' # convert to raster to visualize
-#' # plot(hf_rasterize(terrain), main = "Travel Cost")
+#' # plot(terrain, main = "Travel Cost")
 #'
 #' # tobler on path
 #' # terrain <- hf_terrain(red_butte_dem, hf = "tobler", off.path = FALSE)
@@ -74,13 +73,14 @@ hf_terrain <- function(x,
 
   cells <- setdiff(1:n_cells, na_cells)
 
-  adj <- terra::adjacent(x,
-                         cells = cells,
-                         directions = neighbors,
-                         pairs = TRUE)
+  adj <- terra::adjacent(
+    x,
+    cells = cells,
+    directions = neighbors,
+    pairs = TRUE
+  )
 
   adj <- adj[!adj[, 2] %in% na_cells, ]
-
 
   ### slope ###
   # change in y between adjacent pixels
@@ -89,24 +89,26 @@ hf_terrain <- function(x,
   rise <- (heights[adj[, 2]] - heights[adj[, 1]])
 
   # change in x between adjacent pixels
-  run <- terra::distance(terra::xyFromCell(x, adj[, 1]),
-                         terra::xyFromCell(x, adj[, 2]),
-                         lonlat = FALSE,
-                         pairwise = TRUE)
+  run <- terra::distance(
+    terra::xyFromCell(x, adj[, 1]),
+    terra::xyFromCell(x, adj[, 2]),
+    lonlat = FALSE,
+    pairwise = TRUE
+  )
 
   slope <- rise/run
 
-
   ### speed ###
-  speed_fun <- switch(hf,
-                      "campbell" = campbell,
-                      "tobler"   = tobler,
-                      stop(paste0("hiker does not implement the ",
-                                  hf,
-                                  " hiking function.")))
+  speed_fun <- switch(
+    hf,
+    "campbell" = campbell,
+    "tobler"   = tobler,
+    stop(paste0("hiker does not implement the ",
+                hf,
+                " hiking function."))
+  )
 
   speed <- speed_fun(slope, ...)
-
 
   ### conductance ###
   conductance <- speed/run
@@ -119,10 +121,9 @@ hf_terrain <- function(x,
   conductance[i] <- 0
 
   # build matrix
-  cm <- Matrix::Matrix(0, nrow = n_cells, ncol = n_cells)
+  cm <- Matrix::spMatrix(nrow = n_cells, ncol = n_cells)
 
   cm[adj] <- conductance
-
 
   # include some spatial and other information to make
   # manipulating the network faster and easier
@@ -154,8 +155,6 @@ hf_terrain <- function(x,
 
 }
 
-
-
 #' @name hf_terrain
 #' @export
 #'
@@ -181,8 +180,6 @@ print.terrain <- function(x, ...){
   cat("max cost    :", tmax, "\n")
 
 }
-
-
 
 #' @noRd
 #'
