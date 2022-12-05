@@ -26,7 +26,7 @@
 #'
 #' terrain <- hf_barrier(terrain, red_butte_reservoir)
 #'
-#' plot(hf_rasterize(terrain), main = "Travel Cost")
+#' plot(terrain, main = "Travel Cost")
 #' plot(st_geometry(red_butte_reservoir),
 #'      col = NA,
 #'      border = "red2",
@@ -35,21 +35,26 @@
 hf_barrier <- function(x, barrier) {
 
   stop_if_not_terrain(x)
+
   stop_if_not_sf(barrier)
 
   stop_if_not_crs_equal(x$crs, barrier)
 
-  rr <- terra::rast(nrow   = x$nrow,
-                    ncol   = x$ncol,
-                    extent = terra::ext(x$bb8),
-                    crs    = x$crs)
+  rr <- terra::rast(
+    nrow   = x$nrow,
+    ncol   = x$ncol,
+    extent = terra::ext(x$bb8),
+    crs    = x$crs
+  )
 
   barrier <- terra::vect(barrier)
 
   cells <- terra::cells(rr, barrier)[, 2]
 
-  adj <- cbind("from" = as.integer(x$conductance@i + 1),
-               "to"   = as.integer(x$conductance@j + 1))
+  adj <- cbind(
+    "from" = as.integer(x$conductance@i + 1),
+    "to"   = as.integer(x$conductance@j + 1)
+  )
 
   # find incident edges, from or to cells intersecting barrier
   i <- which(adj[, 1] %in% cells | adj[, 2] %in% cells)

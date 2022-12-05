@@ -30,7 +30,7 @@
 #'                       channel = red_butte_road,
 #'                       .m = 0.6)
 #'
-#' plot(hf_rasterize(terrain), main = "Travel Cost")
+#' plot(terrain, main = "Travel Cost")
 #' plot(st_geometry(red_butte_road),
 #'      col = "red2",
 #'      add = TRUE)
@@ -39,26 +39,31 @@ hf_channel <- function(x, channel, .m = 1) {
 
   if ( .m < 0 || .m > 1 ) {
 
-    stop("The weight, .m, for reducing travel cost must be between 0 and 1.")
+    stop("The weight, .m, for reducing travel cost must be between 0 and 1.", call. = FALSE)
 
   }
 
   stop_if_not_terrain(x)
+
   stop_if_not_sf(channel)
 
   stop_if_not_crs_equal(x$crs, channel)
 
-  rr <- terra::rast(nrow   = x$nrow,
-                    ncol   = x$ncol,
-                    extent = terra::ext(x$bb8),
-                    crs    = x$crs)
+  rr <- terra::rast(
+    nrow   = x$nrow,
+    ncol   = x$ncol,
+    extent = terra::ext(x$bb8),
+    crs    = x$crs
+  )
 
   channel <- terra::vect(channel)
 
   cells <- terra::cells(rr, channel)[, 2]
 
-  adj <- cbind("from" = as.integer(x$conductance@i + 1),
-               "to"   = as.integer(x$conductance@j + 1))
+  adj <- cbind(
+    "from" = as.integer(x$conductance@i + 1),
+    "to"   = as.integer(x$conductance@j + 1)
+  )
 
   # find incident edges, from or to cells intersecting barrier
   i <- which(adj[, 1] %in% cells | adj[, 2] %in% cells)

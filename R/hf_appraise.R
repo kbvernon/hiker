@@ -44,17 +44,21 @@ hf_appraise <- function(x, from, to) {
   from_xy <- sf::st_coordinates(from)[, 1:2, drop = FALSE]
   to_xy   <- sf::st_coordinates(to)[, 1:2, drop = FALSE]
 
-  rr <- terra::rast(nrow   = x$nrow,
-                    ncol   = x$ncol,
-                    extent = terra::ext(x$bb8),
-                    crs    = x$crs)
+  rr <- terra::rast(
+    nrow   = x$nrow,
+    ncol   = x$ncol,
+    extent = terra::ext(x$bb8),
+    crs    = x$crs
+  )
 
   from_cells <- terra::cellFromXY(rr, from_xy)
   to_cells   <- terra::cellFromXY(rr, to_xy)
 
-  graph <- igraph::graph_from_adjacency_matrix(x$conductance,
-                                               mode = "directed",
-                                               weighted = TRUE)
+  graph <- igraph::graph_from_adjacency_matrix(
+    x$conductance,
+    mode = "directed",
+    weighted = TRUE
+  )
 
   # invert conductance to get travel cost
   igraph::E(graph)$weight <- (1/igraph::E(graph)$weight)

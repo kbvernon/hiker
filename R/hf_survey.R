@@ -33,23 +33,28 @@ hf_survey <- function(x, from) {
   stop_if_not_terrain(x)
 
   stop_if_not_sf(from)
+
   stop_if_not_point(from)
 
   stop_if_not_crs_equal(x$crs, from)
 
   from_xy <- sf::st_coordinates(from)[, 1:2, drop = FALSE]
 
-  rr <- terra::rast(nrow   = x$nrow,
-                    ncol   = x$ncol,
-                    extent = terra::ext(x$bb8),
-                    crs    = x$crs)
+  rr <- terra::rast(
+    nrow   = x$nrow,
+    ncol   = x$ncol,
+    extent = terra::ext(x$bb8),
+    crs    = x$crs
+  )
 
   from_cells <- terra::cellFromXY(rr, from_xy)
   to_cells <- unique(as.integer(x$conductance@j)) + 1
 
-  graph <- igraph::graph_from_adjacency_matrix(x$conductance,
-                                               mode = "directed",
-                                               weighted = TRUE)
+  graph <- igraph::graph_from_adjacency_matrix(
+    x$conductance,
+    mode = "directed",
+    weighted = TRUE
+  )
 
   # invert conductance to get travel cost
   igraph::E(graph)$weight <- (1/igraph::E(graph)$weight)

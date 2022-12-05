@@ -25,10 +25,12 @@ hf_rasterize <- function(x) {
 
   stop_if_not_terrain(x)
 
-  rr <- terra::rast(nrow   = x$nrow,
-                    ncol   = x$ncol,
-                    extent = terra::ext(x$bb8),
-                    crs    = x$crs)
+  rr <- terra::rast(
+    nrow   = x$nrow,
+    ncol   = x$ncol,
+    extent = terra::ext(x$bb8),
+    crs    = x$crs
+  )
 
   # this part is basically what Jacob van Etten does with
   # gdistance::raster(TransitionLayer), though that offers more options
