@@ -6,13 +6,9 @@
 \alias{hiker-package}
 \title{hiker: Model Hiking Paths Over Costly Terrains}
 \description{
-\if{html}{\figure{logo.png}{options: align='right' alt='logo' width='120'}}
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-The hiker package provides a suite of functions to model least-cost
-    distances between points, least-cost paths between points, and accumulated 
-    travel time from any point to any location across a landscape. To estimate 
-    the cost of traversing a terrain, hiker implements a few well-known hiking 
-    functions, including Tobler and Campbell.
+The hiker package provides a suite of functions to model least-cost distances between points, least-cost paths between points, and accumulated travel time from any point to any location across a landscape. To estimate the cost of traversing a terrain, hiker implements a few well-known hiking functions, including Tobler and Campbell.
 }
 \details{
 See \code{vignette("hiker", package = "hiker")} for an overview of the package.

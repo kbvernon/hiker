@@ -15,19 +15,6 @@ package, though it works with more modern spatial tools, specifically
 [`sf`](https://r-spatial.github.io/sf/) and
 [`terra`](https://rspatial.github.io/terra/index.html).
 
-Note: `terra` is currently facing some issues with its underlying Rcpp
-that throw seemingly random warnings and errors (see, eg.,
-[\#30](https://github.com/rspatial/terra/issues/30)). For example, you
-might see:
-
-``` r
-Error in x$.self$finalize() : attempt to apply non-function 
-```
-
-Evidently, you can ignore these errors, though it’s still frustrating,
-and users of hiker will just have to live with it until it gets sorted
-out.
-
 ## Installation
 
 The hiker package is not currently on
@@ -48,6 +35,7 @@ University of Utah. If I wanted to hike up this canyon in the shortest
 time possible, what route should I take?
 
 ``` r
+
 library(hiker)
 library(sf)
 library(terra)
@@ -55,14 +43,19 @@ library(viridis)
 ```
 
 ``` r
+
 fn <- system.file("extdata/red_butte_dem.tif", package = "hiker")
 red_butte_dem <- rast(fn)
 
-from <- st_sf(geometry = st_sfc(st_point(c(432000, 4513100)),
-                                crs = 26912))
+from <- st_sf(
+  geometry = st_sfc(st_point(c(432000, 4513100))),
+  crs = 26912
+)
 
-to <- st_sf(geometry = st_sfc(st_point(c(436750, 4518500)),
-                              crs = 26912))
+to <- st_sf(
+  geometry = st_sfc(st_point(c(436750, 4518500))),
+  crs = 26912
+)
 ```
 
 To figure out the “shortest” path from start to end, we need to have
@@ -71,6 +64,7 @@ location in the canyon. This *cost surface* is the terrain we are hiking
 in R.
 
 ``` r
+
 (terrain <- hf_terrain(red_butte_dem))
 #> class       : terrain 
 #> dimensions  : 268, 260, 69680 (nrow, ncol, ncell)
@@ -84,7 +78,7 @@ in R.
 pax <- list(cex.axis = 0.65)
 plg <- list(cex = 0.65)
 
-plot(hf_rasterize(terrain), 
+plot(terrain, 
      col = viridis(50), 
      pax = pax, 
      plg = plg)
@@ -99,6 +93,7 @@ cost surface, to one of our three path functions. For instance,
 `hf_hike()` computes shortest paths and returns them as `sf` objects.
 
 ``` r
+
 short_path <- hf_hike(terrain, from, to)
 
 short_path
@@ -114,6 +109,7 @@ short_path
 Now we can visualize this `short_path`.
 
 ``` r
+
 plot(red_butte_dem, 
      col = viridis(50),
      pax = pax, 
@@ -147,9 +143,9 @@ plot(st_geometry(to),
 
 I am aware of three packages that offer similar functionality:
 
--   [`leastcostpath`](https://github.com/josephlewis/leastcostpath),
--   [`movecost`](https://github.com/cran/movecost), and
--   [`marmap`](https://github.com/ericpante/marmap)
+- [`leastcostpath`](https://github.com/josephlewis/leastcostpath),
+- [`movecost`](https://github.com/cran/movecost), and
+- [`marmap`](https://github.com/ericpante/marmap)
 
 The hiker package differs from these packages in the following ways:
 
@@ -170,7 +166,7 @@ The hiker package differs from these packages in the following ways:
 ## References
 
 Campbell, Michael J., Philip E. Dennison, Bret W. Butler, and Wesley G.
-Page (2019). "Using crowdsourced fitness tracker data to model the
+Page (2019). “Using crowdsourced fitness tracker data to model the
 relationship between slope and travel rates. *Applied Geography* 106,
 93-107. <https://doi.org/10.1016/j.apgeog.2019.03.008>
 

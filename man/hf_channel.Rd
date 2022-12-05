@@ -38,7 +38,7 @@ terrain <- hf_channel(terrain,
                       channel = red_butte_road,
                       .m = 0.6)
 
-plot(hf_rasterize(terrain), main = "Travel Cost")
+plot(terrain, main = "Travel Cost")
 plot(st_geometry(red_butte_road),
      col = "red2",
      add = TRUE)

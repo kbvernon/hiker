@@ -49,8 +49,7 @@ red_butte_dem <- rast(fn)
 
 terrain <- hf_terrain(red_butte_dem)
 
-# convert to raster to visualize
-# plot(hf_rasterize(terrain), main = "Travel Cost")
+# plot(terrain, main = "Travel Cost")
 
 # tobler on path
 # terrain <- hf_terrain(red_butte_dem, hf = "tobler", off.path = FALSE)

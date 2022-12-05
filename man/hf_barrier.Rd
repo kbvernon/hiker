@@ -33,7 +33,7 @@ terrain <- hf_terrain(red_butte_dem)
 
 terrain <- hf_barrier(terrain, red_butte_reservoir)
 
-plot(hf_rasterize(terrain), main = "Travel Cost")
+plot(terrain, main = "Travel Cost")
 plot(st_geometry(red_butte_reservoir),
      col = NA,
      border = "red2",
